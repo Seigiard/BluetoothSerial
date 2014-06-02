@@ -1,15 +1,13 @@
 # Bluetooth Serial Plugin for PhoneGap
 
-This plugin enables serial communication over Bluetooth. It was written for communicating between Android or iOS and an Arduino.
+This plugin enables serial communication over Bluetooth. It was written for communicating between Android ~~or iOS and an Arduino~~ another Android device. The only adjusment made from Don Coleman's original code is to enable the _AcceptThread_ for receiving incoming connections.
 
 Android uses Classic Bluetooth.  iOS uses Bluetooth Low Energy.
 
 ## Supported Platforms
 
 * Android
-* iOS with [BLEMini](http://redbearlab.com/blemini), [BLEShield](http://redbearlab.com/bleshield/) or [Adafruit Bluefruit LE](http://www.adafruit.com/products/1697)
- 
-[Supporting other Bluetooth Low Energy hardware](#supporting-other-ble-hardware)
+* iOS (with [BLEMini](http://redbearlab.com/blemini))
 
 ## Limitations
 
@@ -39,14 +37,13 @@ There are some [sample projects](https://github.com/don/BluetoothSerial/tree/mas
 - [bluetoothSerial.write](#write)
 - [bluetoothSerial.available](#available)
 - [bluetoothSerial.read](#read)
-- [bluetoothSerial.readUntil](#readuntil)
+- [bluetoothSerial.readUntil](#readUntil)
 - [bluetoothSerial.subscribe](#subscribe)
 - [bluetoothSerial.unsubscribe](#unsubscribe)
 - [bluetoothSerial.clear](#clear)
 - [bluetoothSerial.list](#list)
 - [bluetoothSerial.isEnabled](#isenabled)
 - [bluetoothSerial.isConnected](#isconnected)
-- [bluetoothSerial.readRSSI](#readrssi)
 
 ## connect
 
@@ -260,16 +257,14 @@ Example list passed to success callback.  See [BluetoothDevice](http://developer
 
     [{
         "class": 276,
-        "id": "10:BF:48:CB:00:00",        
         "address": "10:BF:48:CB:00:00",
         "name": "Nexus 7"
     }, {
         "class": 7936,
-        "id": "00:06:66:4D:00:00",        
         "address": "00:06:66:4D:00:00",
         "name": "RN42"
     }]
-        
+    
 #### iOS
 
 Function `list` lists the discovered Bluetooth Low Energy peripheral.  The success callback is called with a list of objects.
@@ -277,16 +272,11 @@ Function `list` lists the discovered Bluetooth Low Energy peripheral.  The succe
 Example list passed to success callback for iOS.
 
     [{
-        "id": "CC410A23-2865-F03E-FC6A-4C17E858E11E",        
         "uuid": "CC410A23-2865-F03E-FC6A-4C17E858E11E",
-        "name": "Biscuit",
-        "rssi": -68
+        "name": "Biscuit"
     }]
+
     
-The advertised RSSI **may** be included if available.
-
-`id` is the generic name for `uuid` or [mac]`address` so that code can be platform independent. 
-
 ### Parameters
 
 - __success__: Success callback function that is invoked with a list of bonded devices.
@@ -296,7 +286,7 @@ The advertised RSSI **may** be included if available.
 
     bluetoothSerial.list(function(devices) {
         devices.forEach(function(device) {
-            console.log(device.id);
+            console.log(device.address);
         })
     }, failure);
     
@@ -352,74 +342,39 @@ Function `isEnabled` calls the success callback when bluetooth is enabled and th
         }
     );    
 
-## readRSSI
-
-Reads the RSSI from the connected peripheral.
-
-    bluetoothSerial.readRSSI(success, failure);
-
-### Description
-
-Function `readRSSI` calls the success callback with the rssi.
-
-**BLE only** *This function is experimental and the API may change*
-
-### Parameters
-
-- __success__: Success callback function that is invoked with the rssi value.
-- __failure__: Error callback function, invoked when error occurs. [optional]
-
-### Quick Example
-
-    bluetoothSerial.readRSSI(
-        function(rssi) { 
-            console.log(rssi);
-        }
-    );    
-
-
 # Misc
 
 ## Where does this work? 
 
 ### Android
 
-Current development is done with Cordova 3.4 on Android 4.x. Theoretically this code runs on PhoneGap 2.9 and greater.  It should support Android-10 (2.3.2) and greater, but I only test with Android 4.x.
+Current development is done with Cordova 3.0.0 on Android 4.x. Theoretically this code runs on PhoneGap 2.9 and greater.  It should support Android-10 (2.3.2) and greater, but I only test with Android 4.x.
 
 Development Devices include
- * Nexus 5 with Android 4.4
  * Samsung Galaxy Tab 10.1 (GT-P7510) with Android 4.0.4 (see [Issue #8](https://github.com/don/BluetoothSerial/issues/8))
  * Google Nexus S with Android 4.1.2
  * Nexus 4 with Android 4.2.2
  * Samsung Galaxy S4 with Android 4.3
 
 On the Arduino side I test with [Sparkfun Mate Silver](https://www.sparkfun.com/products/10393) and the [Seeed Studio Bluetooth Shield](http://www.seeedstudio.com/depot/bluetooth-shield-p-866.html?cPath=19_21). The code should be generic and work with most hardware.
-
-I highly recommend [Adafruit's Bluefruit EZ-Link](http://www.adafruit.com/products/1588).
     
 ### iOS
 
-**NOTE: Currently iOS only works with RedBear Labs Hardware and Adafruit Bluefruit LE**
+**NOTE: Currently iOS only works with RedBear Labs BLE Mini Hardware**
 
-This plugin is developed with Cordova 3.4 using iOS 7.x on an iPhone 5s connecting to a [RedBearLab BLEMini](http://redbearlab.com/blemini).
+This plugin was developed with Cordova 3.0 using iOS 6.x on an iPad 4 connecting to a [RedBearLab BLEMini](http://redbearlab.com/blemini).
 
 Ensure that you have update the BLE Mini firmware to at least [Biscuit-UART_20130313.bin](https://github.com/RedBearLab/Biscuit/tree/master/release).
-
-### Supporting other BLE hardware
-
-For Bluetooth Low Energy, this plugin supports the RedBear Labs hardware by default, but can support any Bluetooth Low Energy hardware with a "serial like" service. This means a transmit characteristic that is writable and a receive characteristic that supports notification.
-
-Edit [BLEdefines.h](src/ios/BLEDefines.h) and adjust the UUIDs for your service. 
-
+    
 ## Props
 
 ### Android
 
-Most of the Bluetooth implementation was borrowed from the Bluetooth Chat example in the Android SDK.
+Most of the Bluetooth implementation was borrows from the Bluetooth Chat example in the Android SDK.
 
 ### iOS
 
-The iOS code uses RedBearLab's [BLE_Framework](https://github.com/RedBearLab/iOS/tree/master/BLEFramework/BLE).
+The iOS code uses RedBearLab's [BLE_Framework](https://github.com/RedBearLab/Release/tree/master/BLEMini).
 
 ### API
 
@@ -427,9 +382,7 @@ The API for available, read, readUntil was influenced by the [BtSerial Library f
 
 ## Wrong Bluetooth Plugin?
 
-If you don't need **serial** over Bluetooth, try the [PhoneGap Bluetooth Plugin for Android](https://github.com/phonegap/phonegap-plugins/tree/DEPRECATED/Android/Bluetooth/2.2.0) or perhaps [phonegap-plugin-bluetooth](https://github.com/tanelih/phonegap-bluetooth-plugin).
-
-If you need generic Bluetooth Low Energy support checkout Rand Dusing's [BluetoothLE](https://github.com/randdusing/BluetoothLE).
+If you don't need **serial** over Bluetooth, try the [PhoneGap Bluetooth Plugin for Android](https://github.com/phonegap/phonegap-plugins/tree/master/Android/Bluetooth)
 
 ## What format should the Mac Address be in?
 An example a properly formatted mac address is ``AA:BB:CC:DD:EE:FF``
