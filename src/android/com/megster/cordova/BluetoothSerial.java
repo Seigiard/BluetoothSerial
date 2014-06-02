@@ -126,6 +126,8 @@ public class BluetoothSerial extends CordovaPlugin {
             
             bluetoothSerialService.start();
 
+            bluetoothSerialService.start();
+
             PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
             result.setKeepCallback(true);
             callbackContext.sendPluginResult(result);

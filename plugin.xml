@@ -2,15 +2,15 @@
 <plugin
     xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    id="com.tomvanenckevort.cordova.bluetoothserial"
-    version="0.2.3">
+    id="com.seigiard.cordova.bluetoothserial"
+    version="0.3.1">
 
     <name>Bluetooth Serial</name>
-    <description>Bluetooth Serial Communication Plugin (forked from Don Coleman's original)</description>
+    <description>Bluetooth Serial Communication Plugin</description>
     <license>Apache 2.0</license>
     <keywords>bluetooth, arduino</keywords>
-    <repo>https://github.com/tomvanenckevort/BluetoothSerial.git</repo>
-    <issue>https://github.com/tomvanenckevort/BluetoothSerial/issues</issue>
+    <repo>https://github.com/seigiard/BluetoothSerial.git</repo>
+    <issue>https://github.com/seigiard/BluetoothSerial/issues</issue>
 
     <engines>
         <engine name="cordova" version=">=2.9.0" />
@@ -54,10 +54,12 @@
 
         <header-file src="src/ios/MEGBluetoothSerial.h" target-dir="BluetoothSerial" />
         <source-file src="src/ios/MEGBluetoothSerial.m" target-dir="BluetoothSerial" />
+        <header-file src="src/ios/CBPeripheral+Extensions.h" target-dir="BluetoothSerial" />
+        <source-file src="src/ios/CBPeripheral+Extensions.m" target-dir="BluetoothSerial" />
 
         <!-- BLEMini see http://redbearlab.com -->
         <header-file src="src/ios/BLE.h" target-dir="BluetoothSerial" />
-        <source-file src="src/ios/BLEDefines.h" target-dir="BluetoothSerial" />
+        <header-file src="src/ios/BLEDefines.h" target-dir="BluetoothSerial" />
         <source-file src="src/ios/BLE.m" target-dir="BluetoothSerial" />
 
         <!-- frameworks -->
