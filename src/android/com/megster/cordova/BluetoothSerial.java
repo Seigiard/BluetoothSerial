@@ -123,10 +123,6 @@ public class BluetoothSerial extends CordovaPlugin {
 
             delimiter = args.getString(0);
             dataAvailableCallback = callbackContext;
-            
-            bluetoothSerialService.start();
-
-            bluetoothSerialService.start();
 
             PluginResult result = new PluginResult(PluginResult.Status.NO_RESULT);
             result.setKeepCallback(true);
@@ -185,6 +181,7 @@ public class BluetoothSerial extends CordovaPlugin {
             JSONObject json = new JSONObject();
             json.put("name", device.getName());
             json.put("address", device.getAddress());
+            json.put("id", device.getAddress());
             if (device.getBluetoothClass() != null) {
                 json.put("class", device.getBluetoothClass().getDeviceClass());
             }

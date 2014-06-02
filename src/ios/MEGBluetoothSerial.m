@@ -30,7 +30,7 @@
     [super pluginInitialize];
     
     _bleShield = [[BLE alloc] init];
-    [_bleShield controlSetup:1];
+    [_bleShield controlSetup];
     [_bleShield setDelegate:self];
 
     _buffer = [[NSMutableString alloc] init];
@@ -65,6 +65,7 @@
     
     NSLog(@"disconnect");
     
+    _connectCallbackId = nil;    
     CDVPluginResult *pluginResult = nil;
     pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
 
@@ -72,12 +73,10 @@
         if(_bleShield.activePeripheral.isConnected)
         {
             [[_bleShield CM] cancelPeripheralConnection:[_bleShield activePeripheral]];
-            return;
         }
     }
     
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
-    _connectCallbackId = nil;
 }
 
 - (void)subscribe:(CDVInvokedUrlCommand*)command {
@@ -198,6 +197,18 @@
     [_buffer deleteCharactersInRange:truncate];
 }
 
+- (void)readRSSI:(CDVInvokedUrlCommand*)command {
+    NSLog(@"readRSSI");
+    
+    // TODO if callback exists...
+    [_bleShield readRSSI];
+    CDVPluginResult *pluginResult = nil;
+    pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_NO_RESULT];
+    [pluginResult setKeepCallbackAsBool:TRUE];
+    _rssiCallbackId = [command.callbackId copy];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+}
+
 #pragma mark - BLEDelegate 
 
 - (void)bleDidReceiveData:(unsigned char *)data length:(int)length {
@@ -241,8 +252,13 @@
     _connectCallbackId = nil;
 }
 
-// TODO future versions should add callback for signal strength
 - (void)bleDidUpdateRSSI:(NSNumber *)rssi {
+    if (_rssiCallbackId) {
+        CDVPluginResult *pluginResult = nil;
+        pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDouble:[rssi doubleValue]];
+        [pluginResult setKeepCallbackAsBool:TRUE]; // TODO let expire, unless watching RSSI        
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:_rssiCallbackId];
+    }
 }
 
 #pragma mark - timers
@@ -336,6 +352,7 @@
             NSString *uuid = [NSString stringWithCString:CFStringGetCStringPtr(s, 0)
                                                 encoding:(NSStringEncoding)NSUTF8StringEncoding];
             [peripheral setObject: uuid forKey: @"uuid"];
+            [peripheral setObject: uuid forKey: @"id"];
         }
         else {
             [peripheral setObject: @"" forKey: @"uuid"];
@@ -346,6 +363,12 @@
             name = [peripheral objectForKey:@"uuid"];
         }
         [peripheral setObject: name forKey: @"name"];
+        
+        NSNumber *rssi = [p advertisementRSSI];
+        if (rssi) { // BLEShield doesn't provide advertised RSSI
+            [peripheral setObject: rssi forKey:@"rssi"];
+        }
+        
         [peripherals addObject:peripheral];
     }
     
@@ -425,7 +448,7 @@
         
     for (CBPeripheral *p in peripherals) {
 
-        NSString *other = [NSString stringWithUTF8String:[_bleShield UUIDToString:p.UUID]];
+        NSString *other = p.identifier.UUIDString;
         
         if ([uuid isEqualToString:other]) {
             peripheral = p;
